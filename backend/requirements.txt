@@ -11,7 +11,9 @@ pydantic-settings==2.1.0
 
 # AI and Language Processing
 openai==1.10.0
+groq==0.4.1
 langdetect==1.0.9
+gtts==2.5.4
 
 # HTTP Requests
 requests==2.31.0

@@ -151,6 +151,11 @@ async function sendVoiceMessage(audioBlob) {
             displayAIMessage(data);
         }
         
+        // Auto-play audio response
+        if (data.audio_url && typeof playAudio === 'function') {
+            playAudio(data.audio_url);
+        }
+        
         // Update language indicator
         if (typeof updateLanguageIndicator === 'function') {
             updateLanguageIndicator(data.detected_language.language_name);

@@ -1,58 +1,54 @@
 # DesiFriend AI - Text-to-Speech Module
 """
 Text-to-Speech module for DesiFriend AI.
-Converts AI responses to speech with Indian accent support.
-Uses OpenAI TTS API for voice generation.
+Converts AI responses to speech using Google Text-to-Speech (gTTS) - FREE!
+Supports multiple languages including Indian languages.
 """
 
-from openai import OpenAI
+from gtts import gTTS
 from typing import Optional
 import os
 from pathlib import Path
+import io
 
 
 class TextToSpeech:
     """
-    Text-to-Speech converter with Indian accent support.
-    Generates audio from text using OpenAI TTS API.
+    Text-to-Speech converter using Google Text-to-Speech (gTTS).
+    Completely free and supports multiple languages.
     """
     
-    # Voice mapping based on country and gender
-    VOICE_MAP = {
-        'IN': {
-            'male': 'onyx',    # Deep, warm voice suitable for Indian accent
-            'female': 'nova'   # Friendly, warm female voice
-        },
-        'US': {
-            'male': 'onyx',
-            'female': 'nova'
-        },
-        'GB': {
-            'male': 'echo',    # British-style voice
-            'female': 'shimmer'
-        },
-        'OTHER': {
-            'male': 'onyx',
-            'female': 'nova'
-        }
+    # Language code mapping for gTTS
+    LANGUAGE_MAP = {
+        'en': 'en',      # English
+        'hi': 'hi',      # Hindi
+        'kn': 'kn',      # Kannada (not supported by gTTS, fallback to Hindi)
+        'ta': 'ta',      # Tamil
+        'te': 'te',      # Telugu
+        'ml': 'ml',      # Malayalam
+        'bn': 'bn',      # Bengali
+        'mr': 'mr',      # Marathi
+        'gu': 'gu',      # Gujarati
+        'pa': 'pa'       # Punjabi (not supported by gTTS, fallback to Hindi)
     }
     
-    def __init__(self, api_key: Optional[str] = None, 
-                 output_dir: str = "audio_files"):
+    # Accent/TLD mapping based on country
+    TLD_MAP = {
+        'IN': 'co.in',   # India
+        'US': 'com',     # USA
+        'GB': 'co.uk',   # UK
+        'OTHER': 'com'   # Default
+    }
+    
+    def __init__(self, output_dir: str = "audio_files"):
         """
         Initialize the Text-to-Speech module.
         
         Args:
-            api_key: OpenAI API key (defaults to OPENAI_API_KEY env var)
             output_dir: Directory to save audio files
         """
-        self.api_key = api_key or os.getenv('OPENAI_API_KEY')
-        self.client = OpenAI(api_key=self.api_key)
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
-        
-        # TTS settings
-        self.model = "tts-1"  # Use tts-1 for faster, lower latency
         self.audio_format = "mp3"
     
     def synthesize(self, text: str, 
@@ -60,31 +56,38 @@ class TextToSpeech:
                   gender: str = 'female',
                   language_code: Optional[str] = None) -> bytes:
         """
-        Convert text to speech audio.
+        Convert text to speech audio using gTTS.
         
         Args:
             text: Text to convert to speech
             country_code: Country code for accent ('IN', 'US', 'GB', 'OTHER')
-            gender: Voice gender ('male' or 'female')
-            language_code: Language code (e.g., 'hi', 'en') - currently informational
+            gender: Voice gender (not used in gTTS, kept for compatibility)
+            language_code: Language code (e.g., 'hi', 'en')
             
         Returns:
             Audio data as bytes (MP3 format)
         """
         try:
-            # Select appropriate voice
-            voice = self._select_voice(country_code, gender)
+            # Select language
+            lang = self._select_language(language_code)
             
-            # Call OpenAI TTS API
-            response = self.client.audio.speech.create(
-                model=self.model,
-                voice=voice,
-                input=text,
-                response_format=self.audio_format
+            # Select TLD for accent
+            tld = self.TLD_MAP.get(country_code.upper(), 'com')
+            
+            # Create gTTS object
+            tts = gTTS(
+                text=text,
+                lang=lang,
+                tld=tld,
+                slow=False
             )
             
-            # Return audio bytes
-            return response.content
+            # Save to bytes
+            audio_fp = io.BytesIO()
+            tts.write_to_fp(audio_fp)
+            audio_fp.seek(0)
+            
+            return audio_fp.read()
             
         except Exception as e:
             raise Exception(f"Text-to-speech synthesis failed: {str(e)}")
@@ -101,7 +104,7 @@ class TextToSpeech:
             text: Text to convert to speech
             filename: Output filename (without extension)
             country_code: Country code for accent
-            gender: Voice gender
+            gender: Voice gender (not used in gTTS)
             language_code: Language code
             
         Returns:
@@ -117,48 +120,37 @@ class TextToSpeech:
         
         return str(output_path)
     
-    def _select_voice(self, country_code: str, gender: str) -> str:
+    def _select_language(self, language_code: Optional[str]) -> str:
         """
-        Select appropriate voice based on country and gender.
+        Select appropriate language for gTTS.
         
         Args:
-            country_code: Country code
-            gender: Voice gender
+            language_code: Language code
             
         Returns:
-            Voice identifier for OpenAI TTS
+            Language code for gTTS
         """
-        # Normalize inputs
-        country_code = country_code.upper()
-        gender = gender.lower()
+        if not language_code:
+            return 'en'
         
-        # Default to India if country not found
-        if country_code not in self.VOICE_MAP:
-            country_code = 'IN'
+        # Get language from map, fallback to Hindi for unsupported Indian languages
+        lang = self.LANGUAGE_MAP.get(language_code.lower())
         
-        # Default to female if gender not found
-        if gender not in ['male', 'female']:
-            gender = 'female'
+        if not lang:
+            # If not in map, try using the code directly
+            return language_code.lower()
         
-        return self.VOICE_MAP[country_code][gender]
+        # For Kannada and Punjabi (not supported by gTTS), use Hindi
+        if language_code.lower() in ['kn', 'pa']:
+            return 'hi'
+        
+        return lang
     
-    def set_model(self, model: str):
+    def get_supported_languages(self) -> list:
         """
-        Change the TTS model.
-        
-        Args:
-            model: Model name ('tts-1' for speed, 'tts-1-hd' for quality)
-        """
-        self.model = model
-    
-    def get_supported_voices(self) -> list:
-        """
-        Get list of all supported voice options.
+        Get list of all supported language codes.
         
         Returns:
-            List of voice identifiers
+            List of language codes
         """
-        voices = set()
-        for country_voices in self.VOICE_MAP.values():
-            voices.update(country_voices.values())
-        return sorted(list(voices))
+        return list(self.LANGUAGE_MAP.keys())

@@ -60,6 +60,11 @@ async function handleSendMessage() {
         // Display AI response
         displayAIMessage(response);
         
+        // Auto-play audio if available
+        if (response.audio_url) {
+            playAudio(response.audio_url);
+        }
+        
         // Update language indicator
         updateLanguageIndicator(response.detected_language.language_name);
         

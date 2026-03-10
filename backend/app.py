@@ -191,7 +191,7 @@ async def chat(request: ChatRequest):
             language=lang_result['language_code']
         )
         
-        # Generate audio
+        # Generate audio using gTTS (FREE!)
         audio_filename = f"{session_id}_{uuid.uuid4().hex[:8]}"
         audio_bytes = text_to_speech.synthesize(
             text=ai_response,

@@ -1,11 +1,11 @@
 # DesiFriend AI - AI Engine Module
 """
 AI Engine module for DesiFriend AI.
-Handles conversation with AI model using OpenAI API.
+Handles conversation with AI model using Groq API.
 Generates casual, friendly responses in multiple languages.
 """
 
-from openai import OpenAI
+from groq import Groq
 from typing import List, Dict, Optional
 import os
 
@@ -13,20 +13,20 @@ import os
 class AIEngine:
     """
     AI Engine for generating conversational responses.
-    Uses OpenAI GPT models with casual, friendly tone.
+    Uses Groq LLM models with casual, friendly tone.
     """
     
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-3.5-turbo"):
+    def __init__(self, api_key: Optional[str] = None, model: str = "llama-3.3-70b-versatile"):
         """
         Initialize the AI Engine.
         
         Args:
-            api_key: OpenAI API key (defaults to OPENAI_API_KEY env var)
-            model: OpenAI model to use (default: gpt-3.5-turbo)
+            api_key: Groq API key (defaults to GROQ_API_KEY env var)
+            model: Groq model to use (default: llama-3.3-70b-versatile)
         """
-        self.api_key = api_key or os.getenv('OPENAI_API_KEY')
+        self.api_key = api_key or os.getenv('GROQ_API_KEY')
         self.model = model
-        self.client = OpenAI(api_key=self.api_key)
+        self.client = Groq(api_key=self.api_key)
         self.temperature = 0.7  # Natural variation in responses
         
         # System prompt for casual, friendly tone
@@ -80,7 +80,7 @@ Remember: You're a friend having a conversation, not an AI providing information
         messages.append({"role": "user", "content": user_message})
         
         try:
-            # Call OpenAI API
+            # Call Groq API
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
@@ -120,9 +120,9 @@ Remember: You're a friend having a conversation, not an AI providing information
     
     def set_model(self, model: str):
         """
-        Change the OpenAI model being used.
+        Change the Groq model being used.
         
         Args:
-            model: Model name (e.g., 'gpt-4', 'gpt-3.5-turbo')
+            model: Model name (e.g., 'llama-3.3-70b-versatile', 'mixtral-8x7b-32768')
         """
         self.model = model
