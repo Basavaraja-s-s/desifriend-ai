@@ -1,0 +1,334 @@
+/* DesiFriend AI - Stylesheet */
+/* Mobile-first WhatsApp-inspired design */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #075E54;
+    --secondary-color: #128C7E;
+    --accent-color: #25D366;
+    --bg-color: #ECE5DD;
+    --navbar-bg: #075E54;
+    --user-bubble: #DCF8C6;
+    --ai-bubble: #FFFFFF;
+    --input-bg: #F0F0F0;
+    --text-primary: #000000;
+    --text-secondary: #667781;
+    --border-color: #D1D7DB;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Navbar */
+.navbar {
+    background-color: var(--navbar-bg);
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+}
+
+.navbar-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.language-indicator {
+    background-color: rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+}
+
+/* Chat Container */
+.chat-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 70px 8px 80px 8px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23ECE5DD" width="100" height="100"/></svg>');
+}
+
+.messages {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Message Bubbles */
+.message {
+    display: flex;
+    margin-bottom: 12px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.user-message {
+    justify-content: flex-end;
+}
+
+.ai-message {
+    justify-content: flex-start;
+}
+
+.message-bubble {
+    max-width: 75%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.user-message .message-bubble {
+    background-color: var(--user-bubble);
+    border-bottom-right-radius: 2px;
+}
+
+.ai-message .message-bubble {
+    background-color: var(--ai-bubble);
+    border-bottom-left-radius: 2px;
+}
+
+.message-bubble p {
+    margin: 0;
+    line-height: 1.4;
+    word-wrap: break-word;
+    color: var(--text-primary);
+}
+
+.message-time {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    text-align: right;
+}
+
+/* Audio Button */
+.audio-button {
+    background-color: var(--accent-color);
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    margin-top: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.audio-button:hover {
+    background-color: #20BA5A;
+}
+
+.audio-button:active {
+    transform: scale(0.95);
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    opacity: 0.7;
+}
+
+.typing-dots {
+    display: flex;
+    gap: 4px;
+    padding: 8px 0;
+}
+
+.typing-dots span {
+    width: 8px;
+    height: 8px;
+    background-color: var(--text-secondary);
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 60%, 100% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Input Container */
+.input-container {
+    background-color: var(--input-bg);
+    padding: 8px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+}
+
+.input-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.message-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    font-size: 1rem;
+    outline: none;
+    background-color: white;
+}
+
+.message-input:focus {
+    border-color: var(--secondary-color);
+}
+
+.mic-button,
+.send-button {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--secondary-color);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.mic-button:hover,
+.send-button:hover {
+    background-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.mic-button:active,
+.send-button:active {
+    transform: scale(0.95);
+}
+
+.mic-button.recording {
+    background-color: #DC3545;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+    }
+}
+
+/* Recording Indicator */
+.recording-indicator {
+    text-align: center;
+    padding: 8px;
+    color: #DC3545;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.recording-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #DC3545;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.3;
+    }
+}
+
+/* Scrollbar Styling */
+.chat-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 3px;
+}
+
+.chat-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.3);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .navbar-title {
+        font-size: 1.1rem;
+    }
+    
+    .message-bubble {
+        max-width: 85%;
+    }
+    
+    .message-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
+
+@media (min-width: 769px) {
+    .chat-container {
+        padding: 70px 20px 80px 20px;
+    }
+    
+    .input-container {
+        padding: 12px 20px;
+    }
+}
